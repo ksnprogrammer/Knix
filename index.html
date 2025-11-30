@@ -1,11 +1,69 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- Adcash Integration -->
+    <script id="aclib" type="text/javascript" src="//acscdn.com/script/aclib.js"></script>
+    <script type="text/javascript">
+        aclib.runAutoTag({
+            zoneId: 'p38nlnvcqv',
+        });
+    </script>
+
     <title>Knix - A/L Science Resources</title>
     <meta name="description" content="Free past papers, marking schemes, and study notes for Sinhala Medium A/L Biology, Physics, and Chemistry students.">
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      :root {
+        /* Light Mode Defaults */
+        --bg-primary: #ffffff;
+        --bg-card: #f8fafc;
+        --text-primary: #1e293b;
+        --text-secondary: #64748b;
+        --border-color: #e2e8f0;
+        --input-bg: #f1f5f9;
+        --scroll-thumb: #cbd5e1;
+      }
+      
+      .dark {
+        /* Dark Mode Defaults */
+        --bg-primary: #0a0a0c;
+        --bg-card: #141419;
+        --text-primary: #f1f5f9;
+        --text-secondary: #94a3b8;
+        --border-color: #2a2a35;
+        --input-bg: #1e1e24;
+        --scroll-thumb: #334155;
+      }
+
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--bg-primary);
+        color: var(--text-primary);
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+      
+      .font-rajdhani { font-family: 'Rajdhani', sans-serif; }
+      
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar { width: 8px; }
+      ::-webkit-scrollbar-track { background: var(--bg-primary); }
+      ::-webkit-scrollbar-thumb { background: var(--scroll-thumb); border-radius: 4px; }
+      ::-webkit-scrollbar-thumb:hover { background: #DC143C; }
+      
+      /* Smooth fade in */
+      .fade-in { animation: fadeIn 0.5s ease-in; }
+      @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+      
+      /* Gradient Text Utility */
+      .text-gradient {
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+    </style>
     <script>
       tailwind.config = {
         darkMode: 'class',
@@ -13,13 +71,14 @@
           extend: {
             colors: {
               knix: {
-                bg: '#0a0a0c', /* Darker background for more contrast */
-                card: '#141419',
-                border: '#2a2a35',
-                red: '#ff3300', /* Brighter Neon Red */
-                redHover: '#cc2900',
-                text: '#e2e8f0',
-                muted: '#94a3b8'
+                bg: 'var(--bg-primary)',
+                card: 'var(--bg-card)',
+                border: 'var(--border-color)',
+                text: 'var(--text-primary)',
+                muted: 'var(--text-secondary)',
+                input: 'var(--input-bg)',
+                red: '#DC143C', /* Crimson Red */
+                redHover: '#BE123C', /* Darker Crimson for Hover */
               }
             },
             fontFamily: {
@@ -27,30 +86,15 @@
               rajdhani: ['Rajdhani', 'sans-serif']
             },
             boxShadow: {
-              'glow': '0 0 20px rgba(255, 51, 0, 0.15)',
-              'glow-hover': '0 0 30px rgba(255, 51, 0, 0.3)',
+              'glow': '0 0 20px rgba(220, 20, 60, 0.15)',
+              'glow-hover': '0 0 30px rgba(220, 20, 60, 0.3)',
+              'card': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
             }
           }
         }
       }
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
-    <style>
-      body {
-        font-family: 'Inter', sans-serif;
-        background-color: #0a0a0c;
-        color: #e2e8f0;
-      }
-      .font-rajdhani { font-family: 'Rajdhani', sans-serif; }
-      ::-webkit-scrollbar { width: 6px; }
-      ::-webkit-scrollbar-track { background: #0a0a0c; }
-      ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-      ::-webkit-scrollbar-thumb:hover { background: #ff3300; }
-      
-      /* Smooth fade in */
-      .fade-in { animation: fadeIn 0.5s ease-in; }
-      @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
   <script type="importmap">
 {
   "imports": {

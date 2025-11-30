@@ -1,3 +1,4 @@
+
 export interface User {
   id: string;
   name: string;
@@ -26,6 +27,8 @@ export interface ResourceItem {
   size: string;
   downloads: number;
   url?: string;
+  description?: string;
+  author?: string;
 }
 
 export interface ResourceCategory {

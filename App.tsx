@@ -7,6 +7,7 @@ import { CreatorDashboard } from './components/CreatorDashboard';
 import { Resources } from './components/Resources';
 import { Tools } from './components/Tools';
 import { Star } from 'lucide-react';
+import { AdminDashboard } from './components/AdminDashboard';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -25,33 +26,33 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-knix-bg flex items-center justify-center p-4">
-      <div className="bg-knix-card p-8 rounded-2xl border border-slate-800 w-full max-w-sm">
+    <div className="min-h-screen bg-knix-bg flex items-center justify-center p-4 transition-colors duration-300">
+      <div className="bg-knix-card p-8 rounded-2xl border border-knix-border w-full max-w-sm shadow-card">
         <div className="flex flex-col items-center mb-6">
           <Star className="text-knix-red mb-2 fill-knix-red" size={32} />
-          <h1 className="text-2xl font-bold text-white font-rajdhani">Admin Access</h1>
+          <h1 className="text-2xl font-bold text-knix-text font-rajdhani tracking-wide">Admin Portal</h1>
         </div>
         <form onSubmit={handleLogin} className="space-y-4">
           <input 
              value={username} 
              onChange={e => setUsername(e.target.value)}
-             className="w-full bg-slate-900 border border-slate-700 p-3 rounded text-white"
+             className="w-full bg-knix-input border border-knix-border p-3 rounded-lg text-knix-text focus:outline-none focus:border-knix-red transition-colors placeholder-knix-muted"
              placeholder="Username"
           />
           <input 
              type="password"
              value={password} 
              onChange={e => setPassword(e.target.value)}
-             className="w-full bg-slate-900 border border-slate-700 p-3 rounded text-white"
+             className="w-full bg-knix-input border border-knix-border p-3 rounded-lg text-knix-text focus:outline-none focus:border-knix-red transition-colors placeholder-knix-muted"
              placeholder="Password"
           />
-          {error && <p className="text-red-500 text-xs text-center">{error}</p>}
-          <button type="submit" className="w-full bg-knix-red text-white py-3 rounded font-bold hover:bg-knix-redHover transition-colors">
+          {error && <p className="text-red-500 text-xs text-center font-bold bg-red-500/10 py-1 rounded">{error}</p>}
+          <button type="submit" className="w-full bg-knix-red text-white py-3 rounded-lg font-bold hover:bg-knix-redHover transition-all shadow-glow hover:shadow-glow-hover">
              Enter System
           </button>
         </form>
-        <button onClick={() => navigate('/')} className="w-full text-center text-slate-500 text-sm mt-4 hover:text-white">
-           Return to Site
+        <button onClick={() => navigate('/')} className="w-full text-center text-knix-muted text-sm mt-6 hover:text-knix-text transition-colors">
+           ← Return to Site
         </button>
       </div>
     </div>
@@ -96,6 +97,12 @@ const MainRoutes = () => {
   if (pathname === '/creator') {
     if (role !== 'admin') return <Navigate to="/login" />;
     return <Layout userRole="admin"><CreatorDashboard /></Layout>;
+  }
+  
+  // System Admin (User management)
+  if (pathname === '/admin') {
+     if (role !== 'admin') return <Navigate to="/login" />;
+     return <Layout userRole="admin"><AdminDashboard /></Layout>;
   }
 
   return <Navigate to="/" replace />;

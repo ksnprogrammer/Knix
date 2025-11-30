@@ -1,3 +1,4 @@
+
 import { User, BlogPost, ResourceCategory, ResourceItem, Subject } from '../types';
 import { INITIAL_USERS, INITIAL_POSTS, INITIAL_RESOURCES } from '../constants';
 
@@ -68,5 +69,14 @@ export const db = {
       resources.push({ category, items: [item] });
     }
     localStorage.setItem(KEYS.RESOURCES, JSON.stringify(resources));
+  },
+
+  deleteResource: (resourceId: string) => {
+    const resources = db.getResources();
+    const updated = resources.map(cat => ({
+        ...cat,
+        items: cat.items.filter(item => item.id !== resourceId)
+    }));
+    localStorage.setItem(KEYS.RESOURCES, JSON.stringify(updated));
   }
 };
