@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { db } from '../services/db';
 import { ResourceCategory, Subject } from '../types';
-import { FileText, Download, Book, Share2, Image as ImageIcon, Link as LinkIcon, User, ArrowDownCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { FileText, Download, Book, Share2, Image as ImageIcon, Link as LinkIcon, User, ChevronDown, ChevronUp } from 'lucide-react';
 import { AdUnit } from './AdUnit';
 
 export const Resources: React.FC = () => {
@@ -59,8 +59,8 @@ export const Resources: React.FC = () => {
              onClick={() => setSelectedSubject(subject)}
              className={`px-4 py-2 rounded-full text-sm font-bold transition-all border ${
                selectedSubject === subject
-                 ? 'bg-knix-red border-knix-red text-white'
-                 : 'bg-knix-card border-knix-border text-knix-muted hover:border-knix-red hover:text-white dark:hover:text-white hover:text-knix-red'
+                 ? 'bg-knix-red border-knix-red text-white shadow-glow'
+                 : 'bg-knix-card border-knix-border text-knix-muted hover:border-knix-red hover:text-knix-red dark:hover:text-knix-red'
              }`}
            >
              {subject === 'All' ? 'All' : subject}
@@ -89,9 +89,9 @@ export const Resources: React.FC = () => {
                             const hasLongDesc = item.description && item.description.length > 80;
 
                             return (
-                                <div key={idx} className="p-5 hover:bg-knix-bg/30 transition-colors flex flex-col group gap-4">
+                                <div key={idx} className="p-5 hover:bg-knix-bg/30 transition-colors flex flex-col group gap-4 relative">
                                     <div className="flex items-start gap-4">
-                                        <div className="p-3 bg-knix-bg rounded-lg text-knix-muted group-hover:text-knix-red transition-colors border border-knix-border shrink-0 mt-1">
+                                        <div className="p-3 bg-knix-bg rounded-lg text-knix-muted group-hover:text-knix-red transition-colors border border-knix-border shrink-0 mt-1 shadow-sm">
                                             {item.type === 'pdf' ? <FileText size={24} /> : item.type === 'image' ? <ImageIcon size={24} /> : <LinkIcon size={24} />}
                                         </div>
                                         <div className="space-y-2 flex-1 min-w-0">
@@ -99,11 +99,6 @@ export const Resources: React.FC = () => {
                                                 <h4 className="text-knix-text font-bold text-lg group-hover:text-knix-red transition-colors cursor-pointer leading-tight">
                                                     {item.title}
                                                 </h4>
-                                                {/* Mobile Download Count */}
-                                                <div className="sm:hidden text-right shrink-0">
-                                                     <div className="text-sm font-bold text-knix-text font-rajdhani">{item.downloads.toLocaleString()}</div>
-                                                     <div className="text-[8px] uppercase text-knix-muted font-bold tracking-wider">DLs</div>
-                                                </div>
                                             </div>
                                             
                                             {item.description && (
@@ -138,32 +133,49 @@ export const Resources: React.FC = () => {
                                             </div>
                                         </div>
 
-                                        {/* Desktop Action Area */}
-                                        <div className="hidden sm:flex flex-col items-end gap-3 pl-4 border-l border-knix-border/50 ml-2">
-                                            <div className="text-right min-w-[80px]">
-                                                <div className="text-xl font-bold text-knix-text font-rajdhani">{item.downloads.toLocaleString()}</div>
-                                                <div className="text-[10px] uppercase text-knix-muted font-bold tracking-wider">Downloads</div>
+                                        {/* Desktop Action Area - Visual Update */}
+                                        <div className="hidden sm:flex flex-col items-end gap-3 pl-6 border-l border-knix-border/50 ml-2 min-w-[130px]">
+                                            <div className="text-right">
+                                                <div className="text-2xl font-bold text-knix-red font-rajdhani leading-none drop-shadow-sm">
+                                                    {item.downloads.toLocaleString()}
+                                                </div>
+                                                <div className="text-[10px] uppercase text-knix-muted font-bold tracking-wider mt-0.5">
+                                                    Downloads
+                                                </div>
                                             </div>
 
-                                            <div className="flex items-center gap-2">
-                                                <button onClick={() => handleShare(item.title)} className="p-2 text-knix-muted hover:text-knix-text hover:bg-knix-bg rounded-lg transition-colors border border-transparent hover:border-knix-border" title="Share">
+                                            <div className="flex items-center gap-2 mt-1">
+                                                <button 
+                                                    onClick={() => handleShare(item.title)}
+                                                    className="p-2 text-knix-muted hover:text-knix-text bg-knix-bg border border-knix-border rounded-lg hover:border-knix-red transition-all flex items-center justify-center" 
+                                                    title="Share"
+                                                >
                                                     <Share2 size={16} />
                                                 </button>
-                                                <button className="p-2 text-white bg-knix-red hover:bg-knix-redHover rounded-lg transition-all shadow-lg shadow-knix-red/20 hover:-translate-y-0.5" title="Download">
+                                                <button 
+                                                    className="flex items-center gap-2 px-4 py-2 bg-knix-red text-white rounded-lg font-bold shadow-glow hover:bg-knix-redHover transition-all hover:-translate-y-0.5 active:translate-y-0"
+                                                    title="Download Now"
+                                                >
                                                     <Download size={18} />
                                                 </button>
                                             </div>
                                         </div>
                                     </div>
                                     
-                                    {/* Mobile Actions */}
-                                    <div className="flex sm:hidden justify-end gap-3 pt-2 border-t border-knix-border mt-2 border-dashed">
-                                        <button onClick={() => handleShare(item.title)} className="flex-1 flex items-center justify-center gap-2 py-2 text-xs font-bold text-knix-muted bg-knix-bg border border-knix-border rounded-lg hover:text-knix-text">
-                                            <Share2 size={14} /> Share
-                                        </button>
-                                        <button className="flex-[2] flex items-center justify-center gap-2 py-2 text-xs font-bold text-white bg-knix-red rounded-lg shadow-glow">
-                                            <Download size={14} /> Download
-                                        </button>
+                                    {/* Mobile Actions - Simplified */}
+                                    <div className="flex sm:hidden justify-between items-center pt-3 border-t border-knix-border mt-2 border-dashed">
+                                        <div className="text-left">
+                                             <div className="text-lg font-bold text-knix-text font-rajdhani leading-none">{item.downloads.toLocaleString()}</div>
+                                             <div className="text-[9px] uppercase text-knix-muted font-bold tracking-wider">Downloads</div>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <button onClick={() => handleShare(item.title)} className="p-2 text-knix-muted bg-knix-bg border border-knix-border rounded-lg hover:text-knix-text">
+                                                <Share2 size={16} />
+                                            </button>
+                                            <button className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-white bg-knix-red rounded-lg shadow-glow">
+                                                <Download size={16} /> Download
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             );
