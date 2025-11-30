@@ -1,0 +1,7 @@
+{
+  "name": "Knix - AI Learning Platform",
+  "description": "An open-source, advanced AI-powered learning platform for A/L Biology, Physics, and Chemistry students in Sri Lanka. Features include AI Live Tutor, Video Analysis, and Interactive Lessons.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
