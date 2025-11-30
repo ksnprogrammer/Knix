@@ -19,7 +19,7 @@ export const DB_CONFIG = {
 export const APP_DOMAIN = "knix.gt.tc";
 
 export const MONETIZATION = {
-  // Add your real AdSense Publisher ID here when approved
-  AD_NETWORK_KEY: "ca-pub-XXXXXXXXXXXXX", 
+  // Configured for Monetag & Adcash
+  AD_NETWORK_ZONE_ID: "9ki0ujlsjy", 
   ENABLED: true
 };

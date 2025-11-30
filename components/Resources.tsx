@@ -1,12 +1,14 @@
+
 import React, { useEffect, useState } from 'react';
 import { db } from '../services/db';
 import { ResourceCategory, Subject } from '../types';
-import { FileText, Download, Book, RefreshCw, Eye, ArrowDownCircle, Share2 } from 'lucide-react';
+import { FileText, Download, Book, Share2, Image as ImageIcon, Link as LinkIcon, User, ArrowDownCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { AdUnit } from './AdUnit';
 
 export const Resources: React.FC = () => {
   const [resources, setResources] = useState<ResourceCategory[]>([]);
   const [selectedSubject, setSelectedSubject] = useState<Subject | 'All'>('All');
+  const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
 
   const loadResources = () => {
      setResources(db.getResources());
@@ -31,6 +33,13 @@ export const Resources: React.FC = () => {
         navigator.clipboard.writeText(`${text} - ${url}`);
         alert('Link details copied!');
      }
+  };
+
+  const toggleExpand = (id: string) => {
+    setExpandedItems(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
   };
 
   return (
@@ -63,49 +72,112 @@ export const Resources: React.FC = () => {
 
        <div className="grid md:grid-cols-2 gap-8">
           {filteredResources.map((category) => (
-             <div key={category.category} className="bg-knix-card rounded-xl border border-knix-border overflow-hidden flex flex-col shadow-sm">
-                <div className="px-6 py-4 bg-knix-bg/50 border-b border-knix-border flex items-center justify-between">
-                   <h3 className="text-xl font-bold text-knix-text flex items-center gap-2">
-                      <Book className="text-knix-red" size={20} />
-                      {category.category}
-                   </h3>
-                   <span className="text-xs font-medium bg-knix-bg text-knix-muted px-2 py-1 rounded border border-knix-border">
-                      {category.items.length} Files
-                   </span>
+             category.items.length > 0 && (
+                <div key={category.category} className="bg-knix-card rounded-xl border border-knix-border overflow-hidden flex flex-col shadow-sm">
+                    <div className="px-6 py-4 bg-knix-bg/50 border-b border-knix-border flex items-center justify-between">
+                        <h3 className="text-xl font-bold text-knix-text flex items-center gap-2">
+                            <Book className="text-knix-red" size={20} />
+                            {category.category}
+                        </h3>
+                        <span className="text-xs font-medium bg-knix-bg text-knix-muted px-2 py-1 rounded border border-knix-border">
+                            {category.items.length} Files
+                        </span>
+                    </div>
+                    <div className="divide-y divide-knix-border flex-1">
+                        {category.items.map((item, idx) => {
+                            const isExpanded = !!expandedItems[item.id];
+                            const hasLongDesc = item.description && item.description.length > 80;
+
+                            return (
+                                <div key={idx} className="p-5 hover:bg-knix-bg/30 transition-colors flex flex-col group gap-4">
+                                    <div className="flex items-start gap-4">
+                                        <div className="p-3 bg-knix-bg rounded-lg text-knix-muted group-hover:text-knix-red transition-colors border border-knix-border shrink-0 mt-1">
+                                            {item.type === 'pdf' ? <FileText size={24} /> : item.type === 'image' ? <ImageIcon size={24} /> : <LinkIcon size={24} />}
+                                        </div>
+                                        <div className="space-y-2 flex-1 min-w-0">
+                                            <div className="flex justify-between items-start gap-4">
+                                                <h4 className="text-knix-text font-bold text-lg group-hover:text-knix-red transition-colors cursor-pointer leading-tight">
+                                                    {item.title}
+                                                </h4>
+                                                {/* Mobile Download Count */}
+                                                <div className="sm:hidden text-right shrink-0">
+                                                     <div className="text-sm font-bold text-knix-text font-rajdhani">{item.downloads.toLocaleString()}</div>
+                                                     <div className="text-[8px] uppercase text-knix-muted font-bold tracking-wider">DLs</div>
+                                                </div>
+                                            </div>
+                                            
+                                            {item.description && (
+                                                <div className="relative">
+                                                    <p className={`text-sm text-knix-muted transition-all duration-300 ${isExpanded ? '' : 'line-clamp-2'}`}>
+                                                        {item.description}
+                                                    </p>
+                                                    {hasLongDesc && (
+                                                        <button 
+                                                            onClick={(e) => { e.stopPropagation(); toggleExpand(item.id); }}
+                                                            className="flex items-center gap-1 text-xs text-knix-red font-bold hover:underline mt-1 bg-transparent border-none p-0 cursor-pointer"
+                                                        >
+                                                            {isExpanded ? (
+                                                                <>Show Less <ChevronUp size={12} /></>
+                                                            ) : (
+                                                                <>Read More <ChevronDown size={12} /></>
+                                                            )}
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            )}
+
+                                            <div className="flex flex-wrap items-center gap-3 text-xs text-knix-muted pt-1">
+                                                <span className="bg-knix-bg px-2 py-0.5 rounded border border-knix-border uppercase font-bold text-[10px]">{item.type}</span>
+                                                <span>{item.size}</span>
+                                                {item.author && (
+                                                    <div className="flex items-center gap-1 pl-2 border-l border-knix-border">
+                                                        <User size={10} /> 
+                                                        <span>{item.author}</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* Desktop Action Area */}
+                                        <div className="hidden sm:flex flex-col items-end gap-3 pl-4 border-l border-knix-border/50 ml-2">
+                                            <div className="text-right min-w-[80px]">
+                                                <div className="text-xl font-bold text-knix-text font-rajdhani">{item.downloads.toLocaleString()}</div>
+                                                <div className="text-[10px] uppercase text-knix-muted font-bold tracking-wider">Downloads</div>
+                                            </div>
+
+                                            <div className="flex items-center gap-2">
+                                                <button onClick={() => handleShare(item.title)} className="p-2 text-knix-muted hover:text-knix-text hover:bg-knix-bg rounded-lg transition-colors border border-transparent hover:border-knix-border" title="Share">
+                                                    <Share2 size={16} />
+                                                </button>
+                                                <button className="p-2 text-white bg-knix-red hover:bg-knix-redHover rounded-lg transition-all shadow-lg shadow-knix-red/20 hover:-translate-y-0.5" title="Download">
+                                                    <Download size={18} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Mobile Actions */}
+                                    <div className="flex sm:hidden justify-end gap-3 pt-2 border-t border-knix-border mt-2 border-dashed">
+                                        <button onClick={() => handleShare(item.title)} className="flex-1 flex items-center justify-center gap-2 py-2 text-xs font-bold text-knix-muted bg-knix-bg border border-knix-border rounded-lg hover:text-knix-text">
+                                            <Share2 size={14} /> Share
+                                        </button>
+                                        <button className="flex-[2] flex items-center justify-center gap-2 py-2 text-xs font-bold text-white bg-knix-red rounded-lg shadow-glow">
+                                            <Download size={14} /> Download
+                                        </button>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
-                <div className="divide-y divide-knix-border flex-1">
-                   {category.items.length === 0 ? (
-                      <div className="p-8 text-center text-knix-muted text-sm italic">
-                         No resources uploaded.
-                      </div>
-                   ) : (
-                     category.items.map((item, idx) => (
-                        <div key={idx} className="p-4 hover:bg-knix-bg/30 transition-colors flex items-center justify-between group">
-                           <div className="flex items-start gap-4">
-                              <div className="p-3 bg-knix-bg rounded-lg text-knix-muted group-hover:text-knix-text transition-colors border border-knix-border">
-                                 <FileText size={24} />
-                              </div>
-                              <div>
-                                 <h4 className="text-knix-text font-medium mb-1 group-hover:text-knix-red transition-colors cursor-pointer">{item.title}</h4>
-                                 <p className="text-knix-muted text-xs uppercase font-bold flex items-center gap-2">
-                                   {item.type} • <span className="font-normal">{item.size} • {item.downloads} Downloads</span>
-                                 </p>
-                              </div>
-                           </div>
-                           <div className="flex items-center gap-2">
-                              <button onClick={() => handleShare(item.title)} className="p-2 text-knix-muted hover:text-knix-text rounded-lg transition-colors" title="Share">
-                                 <Share2 size={16} />
-                              </button>
-                              <button className="p-2 text-white bg-knix-red hover:bg-knix-redHover rounded-lg transition-all shadow-lg shadow-knix-red/20" title="Download">
-                                 <Download size={18} />
-                              </button>
-                           </div>
-                        </div>
-                     ))
-                   )}
-                </div>
-             </div>
+             )
           ))}
+          
+          {filteredResources.every(cat => cat.items.length === 0) && (
+             <div className="col-span-full p-12 text-center border border-dashed border-knix-border rounded-xl">
+                <p className="text-knix-muted italic">No resources found for the selected filter.</p>
+             </div>
+          )}
        </div>
     </div>
   );

@@ -1,3 +1,4 @@
+
 import { BlogPost, ResourceCategory, User } from './types';
 
 // Initial Data for the DB Service
@@ -41,29 +42,93 @@ export const INITIAL_RESOURCES: ResourceCategory[] = [
   {
     category: "Biology",
     items: [
-      { id: 'r1', title: "2023 A/L Biology Past Paper (Sinhala Medium)", type: "pdf", size: "4.2 MB", downloads: 1240 },
-      { id: 'r2', title: "Resource Book: Unit 5 (Sinhala)", type: "pdf", size: "12.5 MB", downloads: 850 },
+      { 
+        id: 'r1', 
+        title: "2023 A/L Biology Past Paper (Sinhala Medium)", 
+        type: "pdf", 
+        size: "4.2 MB", 
+        downloads: 1240, 
+        description: "Official past paper including Part I (MCQ) and Part II (Essay) with structured questions.",
+        author: "Department of Examinations"
+      },
+      { 
+        id: 'r2', 
+        title: "Resource Book: Unit 5 (Sinhala)", 
+        type: "pdf", 
+        size: "12.5 MB", 
+        downloads: 850,
+        description: "National Institute of Education (NIE) official resource book for Plant form and function.",
+        author: "NIE"
+      },
     ]
   },
   {
     category: "Combined Maths",
     items: [
-      { id: 'r3', title: "2023 A/L Combined Maths Past Paper", type: "pdf", size: "5.1 MB", downloads: 1800 },
-      { id: 'r4', title: "Trigonometry Short Notes", type: "image", size: "1.2 MB", downloads: 3400 },
+      { 
+        id: 'r3', 
+        title: "2023 A/L Combined Maths Past Paper", 
+        type: "pdf", 
+        size: "5.1 MB", 
+        downloads: 1800,
+        description: "Complete paper covering Pure Mathematics and Applied Mathematics.",
+        author: "Department of Examinations"
+      },
+      { 
+        id: 'r4', 
+        title: "Trigonometry Short Notes", 
+        type: "image", 
+        size: "1.2 MB", 
+        downloads: 3400,
+        description: "Quick revision cheat sheet for all trigonometric identities and formulas.",
+        author: "K.Sithara"
+      },
     ]
   },
   {
     category: "Physics",
     items: [
-      { id: 'r5', title: "2023 A/L Physics Past Paper", type: "pdf", size: "3.8 MB", downloads: 1500 },
-      { id: 'r6', title: "Electronics Model Questions", type: "pdf", size: "2.1 MB", downloads: 900 }
+      { 
+        id: 'r5', 
+        title: "2023 A/L Physics Past Paper", 
+        type: "pdf", 
+        size: "3.8 MB", 
+        downloads: 1500,
+        description: "Full past paper document.",
+        author: "Department of Examinations"
+      },
+      { 
+        id: 'r6', 
+        title: "Electronics Model Questions", 
+        type: "pdf", 
+        size: "2.1 MB", 
+        downloads: 900,
+        description: "Target questions for the Electronics unit with answers.",
+        author: "Physics Unit"
+      }
     ]
   },
   {
     category: "Chemistry",
     items: [
-      { id: 'r7', title: "2023 A/L Chemistry Past Paper", type: "pdf", size: "4.5 MB", downloads: 1100 },
-      { id: 'r8', title: "Organic Chemistry Road Map", type: "image", size: "1.8 MB", downloads: 2200 }
+      { 
+        id: 'r7', 
+        title: "2023 A/L Chemistry Past Paper", 
+        type: "pdf", 
+        size: "4.5 MB", 
+        downloads: 1100,
+        description: "Chemistry past paper 2023.",
+        author: "Department of Examinations" 
+      },
+      { 
+        id: 'r8', 
+        title: "Organic Chemistry Road Map", 
+        type: "image", 
+        size: "1.8 MB", 
+        downloads: 2200,
+        description: "Visual map for organic reaction conversions.",
+        author: "Knix Edu"
+      }
     ]
   }
 ];

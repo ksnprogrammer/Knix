@@ -202,10 +202,11 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole }) => {
             {userRole === 'guest' && (
                <button 
                   onClick={() => navigate('/login')} 
-                  className="p-2.5 text-knix-muted hover:text-knix-red hover:bg-knix-card rounded-lg transition-colors border border-transparent hover:border-knix-border" 
+                  className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-knix-red bg-knix-red/10 border border-knix-red/20 rounded-lg hover:bg-knix-red hover:text-white transition-all shadow-sm ml-2"
                   title="Admin Login"
                >
-                  <ShieldCheck size={20} />
+                  <ShieldCheck size={16} />
+                  <span className="hidden md:inline">Admin</span>
                </button>
             )}
 
