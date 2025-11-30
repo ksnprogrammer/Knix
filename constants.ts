@@ -1,8 +1,14 @@
-import { Course, Lesson } from './types';
-import { FileText, Video, Book, Download } from 'lucide-react';
+import { Course, Lesson, ResourceCategory, User } from './types';
 
-// Mock Data matching the aesthetic and subjects
-export const COURSES: Course[] = [
+// Initial Data for the DB Service
+export const INITIAL_USERS: User[] = [
+  { id: 'u1', name: 'Alex Perera', email: 'alex@knix.lk', role: 'student', joinedDate: '2024-01-15' },
+  { id: 'u2', name: 'Saman Silva', email: 'admin@knix.lk', role: 'admin', joinedDate: '2023-11-01' },
+  { id: 'u3', name: 'Dr. Jayasinghe', email: 'tutor@knix.lk', role: 'content_creator', joinedDate: '2024-02-20' },
+  { id: 'u4', name: 'Kasun De Silva', email: 'kasun@gmail.com', role: 'student', joinedDate: '2025-01-10' },
+];
+
+export const INITIAL_COURSES: Course[] = [
   {
     id: 'bio-101',
     title: 'Cell Structure & Function',
@@ -12,6 +18,17 @@ export const COURSES: Course[] = [
     thumbnail: 'https://picsum.photos/400/225?random=1',
     instructor: 'Dr. A. Perera',
     duration: '4 Weeks',
+    syllabusUrl: '#'
+  },
+  {
+    id: 'maths-401',
+    title: 'Integration & Differentiation',
+    subject: 'Combined Maths',
+    progress: 15,
+    description: 'Master Calculus fundamentals for the A/L examination.',
+    thumbnail: 'https://picsum.photos/400/225?random=5',
+    instructor: 'Mr. K. Amal',
+    duration: '10 Weeks',
     syllabusUrl: '#'
   },
   {
@@ -35,17 +52,6 @@ export const COURSES: Course[] = [
     instructor: 'Dr. R. Fernando',
     duration: '8 Weeks',
     syllabusUrl: '#'
-  },
-  {
-    id: 'bio-102',
-    title: 'Genetics & Evolution',
-    subject: 'Biology',
-    progress: 0,
-    description: 'Understanding DNA, inheritance, and evolutionary biology.',
-    thumbnail: 'https://picsum.photos/400/225?random=4',
-    instructor: 'Ms. K. Jayasinghe',
-    duration: '5 Weeks',
-    syllabusUrl: '#'
   }
 ];
 
@@ -68,29 +74,33 @@ export const RECENT_ACTIVITY = [
   { text: 'AI content generated for "WordAI"', time: '2 hours ago', type: 'user' },
 ];
 
-export const RESOURCES = [
+export const INITIAL_RESOURCES: ResourceCategory[] = [
   {
     category: "Biology",
     items: [
-      { title: "2023 A/L Biology Past Paper (Part I & II)", type: "pdf", size: "4.2 MB", downloads: 1240 },
-      { title: "Resource Book: Unit 5 - Animal Form and Function", type: "pdf", size: "12.5 MB", downloads: 850 },
-      { title: "Marking Scheme 2022", type: "pdf", size: "1.1 MB", downloads: 2300 }
+      { id: 'r1', title: "2023 A/L Biology Past Paper (Part I & II)", type: "pdf", size: "4.2 MB", downloads: 1240 },
+      { id: 'r2', title: "Resource Book: Unit 5 - Animal Form", type: "pdf", size: "12.5 MB", downloads: 850 },
+    ]
+  },
+  {
+    category: "Combined Maths",
+    items: [
+      { id: 'r3', title: "2023 A/L Combined Maths Past Paper", type: "pdf", size: "5.1 MB", downloads: 1800 },
+      { id: 'r4', title: "Pure Maths: Trigonometry Formulas", type: "image", size: "1.2 MB", downloads: 3400 },
     ]
   },
   {
     category: "Physics",
     items: [
-      { title: "2023 A/L Physics Past Paper", type: "pdf", size: "3.8 MB", downloads: 1500 },
-      { title: "Electronics: Logic Gates Summary", type: "pdf", size: "0.5 MB", downloads: 540 },
-      { title: "Mechanics: Newton's Laws Deep Dive", type: "pdf", size: "2.1 MB", downloads: 900 }
+      { id: 'r5', title: "2023 A/L Physics Past Paper", type: "pdf", size: "3.8 MB", downloads: 1500 },
+      { id: 'r6', title: "Mechanics: Newton's Laws Deep Dive", type: "pdf", size: "2.1 MB", downloads: 900 }
     ]
   },
   {
-    category: "Chemistry",
+    category: "ICT",
     items: [
-      { title: "2023 A/L Chemistry Past Paper", type: "pdf", size: "4.5 MB", downloads: 1100 },
-      { title: "Industrial Chemistry Chart", type: "image", size: "2.5 MB", downloads: 3200 },
-      { title: "Organic Conversions Mind Map", type: "image", size: "1.8 MB", downloads: 4100 }
+      { id: 'r7', title: "2023 A/L ICT Past Paper", type: "pdf", size: "3.5 MB", downloads: 950 },
+      { id: 'r8', title: "Python Programming Guide", type: "pdf", size: "2.8 MB", downloads: 1200 }
     ]
   }
 ];

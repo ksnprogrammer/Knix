@@ -1,7 +1,7 @@
 import React from 'react';
 import { Course, StatCardProps } from '../types';
 import { PlayCircle, Clock, Award, ArrowRight } from 'lucide-react';
-import { COURSES } from '../constants';
+import { INITIAL_COURSES } from '../constants';
 import { useNavigate } from './Layout';
 
 const StatCard: React.FC<StatCardProps> = ({ title, value, subtext, icon }) => (
@@ -79,7 +79,7 @@ export const Dashboard: React.FC = () => {
           <button className="text-sm text-knix-red hover:text-white transition-colors">View All</button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {COURSES.slice(0, 3).map(course => (
+          {INITIAL_COURSES.slice(0, 3).map(course => (
             <CourseCard key={course.id} course={course} />
           ))}
         </div>

@@ -2,19 +2,36 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'student' | 'admin';
+  role: 'student' | 'admin' | 'content_creator';
+  joinedDate: string;
 }
+
+export type Subject = 'Biology' | 'Physics' | 'Chemistry' | 'Combined Maths' | 'ICT';
 
 export interface Course {
   id: string;
   title: string;
-  subject: 'Biology' | 'Physics' | 'Chemistry';
+  subject: Subject;
   progress: number;
   description: string;
   thumbnail: string;
   instructor: string;
   duration: string;
   syllabusUrl: string;
+}
+
+export interface ResourceItem {
+  id: string;
+  title: string;
+  type: 'pdf' | 'image' | 'link';
+  size: string;
+  downloads: number;
+  url?: string;
+}
+
+export interface ResourceCategory {
+  category: Subject;
+  items: ResourceItem[];
 }
 
 export interface Lesson {

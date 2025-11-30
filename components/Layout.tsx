@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { LayoutDashboard, BookOpen, User, Settings, LogOut, Menu, Search, Bell, Database, Mic, PenTool, Library } from 'lucide-react';
+import { LayoutDashboard, BookOpen, User, Settings, LogOut, Menu, Search, Bell, Database, Mic, PenTool, Library, MonitorPlay } from 'lucide-react';
 
 // --- Custom Router Logic (Replacing react-router-dom) ---
 const RouterContext = createContext<{
@@ -63,7 +63,7 @@ export const Router: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
 interface LayoutProps {
   children: React.ReactNode;
-  userRole: 'admin' | 'student';
+  userRole: 'admin' | 'student' | 'content_creator';
 }
 
 export const Layout: React.FC<LayoutProps> = ({ children, userRole }) => {
@@ -117,13 +117,21 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole }) => {
           <NavItem icon={Mic} label="Live Tutor" path="/live" />
           <NavItem icon={PenTool} label="AI Lab" path="/tools" />
           
+          {(userRole === 'admin' || userRole === 'content_creator') && (
+             <>
+               <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4 mt-6 px-4">
+                  {isSidebarOpen ? 'Studio' : '...'}
+               </div>
+               <NavItem icon={MonitorPlay} label="Creator Panel" path="/creator" />
+             </>
+          )}
+
           {userRole === 'admin' && (
             <>
               <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4 mt-6 px-4">
                 {isSidebarOpen ? 'Admin' : '...'}
               </div>
-              <NavItem icon={Database} label="Content Gen" path="/admin" />
-              <NavItem icon={User} label="Users" path="/users" />
+              <NavItem icon={Database} label="System Admin" path="/admin" />
             </>
           )}
         </nav>
@@ -161,7 +169,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole }) => {
               <Search size={16} className="text-slate-400 mr-2" />
               <input 
                 type="text" 
-                placeholder="Search resources..." 
+                placeholder="Search..." 
                 className="bg-transparent border-none focus:outline-none text-sm text-white w-48"
               />
             </div>

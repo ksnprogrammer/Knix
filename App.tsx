@@ -2,22 +2,25 @@ import React, { useState } from 'react';
 import { Layout, Router, Navigate, useLocation, useNavigate } from './components/Layout';
 import { Dashboard } from './components/Dashboard';
 import { AdminDashboard } from './components/AdminDashboard';
+import { CreatorDashboard } from './components/CreatorDashboard';
 import { LessonView } from './components/LessonView';
 import { LiveTutor } from './components/LiveTutor';
 import { Tools } from './components/Tools';
 import { Resources } from './components/Resources';
-import { Brain, ArrowRight, CheckCircle, Zap, Video, Mic, BookOpen, Layers, Users, Github, Twitter, Globe } from 'lucide-react';
+import { Brain, ArrowRight, CheckCircle, Zap, Video, Mic, BookOpen, Layers, Users, Github, Twitter, Globe, PenTool } from 'lucide-react';
 
 // --- Login Component ---
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
-  const [role, setRole] = useState<'admin' | 'student'>('student');
+  const [role, setRole] = useState<'admin' | 'student' | 'content_creator'>('student');
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     localStorage.setItem('userRole', role);
-    navigate(role === 'admin' ? '/admin' : '/dashboard');
+    if (role === 'admin') navigate('/admin');
+    else if (role === 'content_creator') navigate('/creator');
+    else navigate('/dashboard');
   };
 
   return (
@@ -33,7 +36,9 @@ const Login: React.FC = () => {
              </div>
              <h1 className="text-3xl font-bold text-white tracking-tight">Knix</h1>
           </button>
-          <p className="text-slate-500 font-medium">{role === 'admin' ? 'Admin Access' : 'Student Portal'}</p>
+          <p className="text-slate-500 font-medium">
+             {role === 'admin' ? 'Admin Access' : role === 'content_creator' ? 'Creator Studio' : 'Student Portal'}
+          </p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-6">
@@ -58,11 +63,14 @@ const Login: React.FC = () => {
             />
           </div>
 
-          <div className="flex items-center justify-between text-sm">
-             <div className="flex items-center gap-4">
-                <button type="button" onClick={() => setRole('student')} className={`${role === 'student' ? 'text-knix-red' : 'text-slate-500'}`}>Student</button>
-                <button type="button" onClick={() => setRole('admin')} className={`${role === 'admin' ? 'text-knix-red' : 'text-slate-500'}`}>Admin</button>
-             </div>
+          {/* Role Selection Tabs */}
+          <div className="grid grid-cols-3 gap-2 bg-slate-900 p-1 rounded-lg">
+             <button type="button" onClick={() => setRole('student')} className={`text-xs py-2 rounded ${role === 'student' ? 'bg-knix-red text-white' : 'text-slate-500 hover:text-white'}`}>Student</button>
+             <button type="button" onClick={() => setRole('content_creator')} className={`text-xs py-2 rounded ${role === 'content_creator' ? 'bg-knix-red text-white' : 'text-slate-500 hover:text-white'}`}>Creator</button>
+             <button type="button" onClick={() => setRole('admin')} className={`text-xs py-2 rounded ${role === 'admin' ? 'bg-knix-red text-white' : 'text-slate-500 hover:text-white'}`}>Admin</button>
+          </div>
+
+          <div className="flex items-center justify-end text-sm">
              <a href="#" className="text-slate-500 hover:text-white">Forgot Password?</a>
           </div>
 
@@ -99,13 +107,13 @@ const Landing: React.FC = () => {
     },
     {
       icon: <BookOpen className="text-green-500" size={32} />,
-      title: "Smart Resources",
-      desc: "Access a vast library of A/L past papers and marking schemes. Our AI helps you find the exact questions you need to practice."
+      title: "Resource Library",
+      desc: "Download Past Papers, Marking Schemes, and Short Notes for Bio, Physics, and Combined Maths all in one place."
     },
     {
       icon: <Layers className="text-purple-500" size={32} />,
-      title: "Interactive Slides",
-      desc: "Learn from AI-generated slide decks that adapt to your syllabus. Each slide comes with an integrated chat for instant doubts."
+      title: "Creator Studio",
+      desc: "Teachers and Content Creators can manage their own courses and upload resources to the Knix ecosystem."
     }
   ];
 
@@ -165,7 +173,7 @@ const Landing: React.FC = () => {
                Master Science with <br/> <span className="text-knix-red">Artificial Intelligence</span>
             </h1>
             <p className="text-xl text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed">
-               Knix is the advanced open-source learning platform for Bio, Physics, and Chemistry. 
+               Knix is the advanced open-source learning platform for Bio, Physics, and Combined Maths. 
                Experience the next generation of studying with AI-powered tools completely free.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
@@ -400,6 +408,13 @@ const MainRoutes = () => {
         <AdminDashboard />
       </Layout>
     );
+  }
+  if (pathname === '/creator') {
+    return (
+       <Layout userRole="content_creator">
+          <CreatorDashboard />
+       </Layout>
+    )
   }
 
   return <Navigate to="/" replace />;
