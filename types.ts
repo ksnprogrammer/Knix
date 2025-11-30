@@ -8,16 +8,15 @@ export interface User {
 
 export type Subject = 'Biology' | 'Physics' | 'Chemistry' | 'Combined Maths' | 'ICT';
 
-export interface Course {
+export interface BlogPost {
   id: string;
   title: string;
+  content: string; // Markdown/Text
   subject: Subject;
-  progress: number;
-  description: string;
-  thumbnail: string;
-  instructor: string;
-  duration: string;
-  syllabusUrl: string;
+  author: string;
+  date: string;
+  imageUrl?: string;
+  likes: number;
 }
 
 export interface ResourceItem {
@@ -34,20 +33,10 @@ export interface ResourceCategory {
   items: ResourceItem[];
 }
 
-export interface Lesson {
-  id: string;
-  courseId: string;
-  title: string;
-  content: string; // Slide text content or video URL
-  slideUrl: string;
-  notes: string;
-}
-
-export interface ChatMessage {
-  id: string;
-  role: 'user' | 'model';
-  text: string;
-  timestamp: Date;
+export interface AdConfig {
+  enabled: boolean;
+  placementId: string;
+  format: 'banner' | 'sidebar' | 'native';
 }
 
 export interface StatCardProps {

@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { LayoutDashboard, BookOpen, User, Settings, LogOut, Menu, Search, Bell, Database, Mic, PenTool, Library, MonitorPlay } from 'lucide-react';
+import { LayoutDashboard, BookOpen, Settings, LogOut, Menu, Search, Bell, MonitorPlay, Star, Dna, Atom, FlaskConical, Calculator, Cpu, Home } from 'lucide-react';
+import { AdUnit } from './AdUnit';
 
-// --- Custom Router Logic (Replacing react-router-dom) ---
+// --- Router Context ---
 const RouterContext = createContext<{
   path: string;
   navigate: (path: string) => void;
@@ -9,61 +10,28 @@ const RouterContext = createContext<{
 }>({ path: '/', navigate: () => {}, params: {} });
 
 export const useRouter = () => useContext(RouterContext);
-
-export const useLocation = () => {
-  const { path } = useRouter();
-  return { pathname: path };
-};
-
-export const useNavigate = () => {
-  const { navigate } = useRouter();
-  return navigate;
-};
-
-export const useParams = () => {
-  const { params } = useRouter();
-  return params;
-};
-
+export const useLocation = () => { const { path } = useRouter(); return { pathname: path }; };
+export const useNavigate = () => { const { navigate } = useRouter(); return navigate; };
+export const useParams = () => { const { params } = useRouter(); return params; };
 export const Navigate: React.FC<{ to: string; replace?: boolean }> = ({ to }) => {
   const { navigate } = useRouter();
-  useEffect(() => {
-    navigate(to);
-  }, [to, navigate]);
+  useEffect(() => { navigate(to); }, [to, navigate]);
   return null;
 };
-
 export const Router: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [path, setPath] = useState(window.location.hash.slice(1) || '/');
-
   useEffect(() => {
-    const handleHashChange = () => {
-      setPath(window.location.hash.slice(1) || '/');
-    };
+    const handleHashChange = () => setPath(window.location.hash.slice(1) || '/');
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
-
-  const navigate = (to: string) => {
-    window.location.hash = to;
-  };
-
-  const params: Record<string, string> = {};
-  if (path.startsWith('/course/')) {
-    params.id = path.replace('/course/', '');
-  }
-
-  return (
-    <RouterContext.Provider value={{ path, navigate, params }}>
-      {children}
-    </RouterContext.Provider>
-  );
+  const navigate = (to: string) => { window.location.hash = to; };
+  return <RouterContext.Provider value={{ path, navigate, params: {} }}>{children}</RouterContext.Provider>;
 };
-// --- End Custom Router Logic ---
 
 interface LayoutProps {
   children: React.ReactNode;
-  userRole: 'admin' | 'student' | 'content_creator';
+  userRole: 'admin' | 'student' | 'content_creator' | 'guest';
 }
 
 export const Layout: React.FC<LayoutProps> = ({ children, userRole }) => {
@@ -94,63 +62,67 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole }) => {
         className={`${isSidebarOpen ? 'w-64' : 'w-20'} bg-knix-bg border-r border-slate-800 flex-shrink-0 transition-all duration-300 flex flex-col hidden md:flex`}
       >
         <div className="p-6 flex items-center justify-between">
-          <div className={`flex items-center ${!isSidebarOpen && 'justify-center w-full'}`}>
-            <div className="w-8 h-8 bg-knix-red rounded-lg flex items-center justify-center mr-2">
-               <Database className="text-white" size={18} />
-            </div>
-            {isSidebarOpen && <span className="text-xl font-bold text-white tracking-tight">Knix</span>}
+          <div className={`flex items-center ${!isSidebarOpen && 'justify-center w-full'}`} onClick={() => navigate('/')} style={{cursor: 'pointer'}}>
+             <Star className="text-knix-red mr-2 fill-knix-red" size={24} />
+             {isSidebarOpen && <span className="text-2xl font-bold text-white tracking-tight font-rajdhani">Knix</span>}
           </div>
         </div>
 
         <nav className="flex-1 px-4 mt-4 overflow-y-auto">
           <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4 px-4">
-            {isSidebarOpen ? 'Learning' : '...'}
+            {isSidebarOpen ? 'Main' : '...'}
           </div>
+          <NavItem icon={Home} label="Home" path="/" />
+          <NavItem icon={LayoutDashboard} label="My Dashboard" path="/dashboard" />
           
-          <NavItem icon={LayoutDashboard} label="Dashboard" path="/dashboard" />
-          <NavItem icon={BookOpen} label="Subjects" path="/subjects" />
-          <NavItem icon={Library} label="Resources" path="/resources" />
+          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4 mt-6 px-4">
+            {isSidebarOpen ? 'Subjects' : '...'}
+          </div>
+          <NavItem icon={Dna} label="Biology" path="/biology" />
+          <NavItem icon={Atom} label="Physics" path="/physics" />
+          <NavItem icon={FlaskConical} label="Chemistry" path="/chemistry" />
+          <NavItem icon={Calculator} label="Comb. Maths" path="/maths" />
+          <NavItem icon={Cpu} label="ICT" path="/ict" />
 
           <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4 mt-6 px-4">
-            {isSidebarOpen ? 'AI Tools' : '...'}
+            {isSidebarOpen ? 'Library' : '...'}
           </div>
-          <NavItem icon={Mic} label="Live Tutor" path="/live" />
-          <NavItem icon={PenTool} label="AI Lab" path="/tools" />
+          <NavItem icon={BookOpen} label="All Resources" path="/resources" />
           
-          {(userRole === 'admin' || userRole === 'content_creator') && (
+          {(userRole === 'admin') && (
              <>
                <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4 mt-6 px-4">
-                  {isSidebarOpen ? 'Studio' : '...'}
+                  {isSidebarOpen ? 'Manage' : '...'}
                </div>
-               <NavItem icon={MonitorPlay} label="Creator Panel" path="/creator" />
+               <NavItem icon={MonitorPlay} label="Creator Studio" path="/creator" />
              </>
-          )}
-
-          {userRole === 'admin' && (
-            <>
-              <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4 mt-6 px-4">
-                {isSidebarOpen ? 'Admin' : '...'}
-              </div>
-              <NavItem icon={Database} label="System Admin" path="/admin" />
-            </>
           )}
         </nav>
 
+        {/* Sidebar Ad Placement */}
+        {isSidebarOpen && (
+           <div className="px-4 mb-4">
+              <AdUnit format="sidebar" className="h-40" />
+           </div>
+        )}
+
         <div className="p-4 border-t border-slate-800 mt-auto">
-           <button onClick={() => navigate('/settings')} className="flex items-center w-full px-4 py-2 text-slate-400 hover:text-white mb-2">
-              <Settings size={20} className="mr-3" />
-              {isSidebarOpen && <span>Settings</span>}
-           </button>
-           <button onClick={() => navigate('/')} className="flex items-center w-full px-4 py-2 text-slate-400 hover:text-white transition-colors">
-              <LogOut size={20} className="mr-3" />
-              {isSidebarOpen && <span>Logout</span>}
-           </button>
+           {userRole !== 'guest' && (
+              <button onClick={() => { localStorage.removeItem('userRole'); navigate('/'); }} className="flex items-center w-full px-4 py-2 text-slate-400 hover:text-white transition-colors">
+                 <LogOut size={20} className="mr-3" />
+                 {isSidebarOpen && <span>Logout</span>}
+              </button>
+           )}
+           {userRole === 'guest' && isSidebarOpen && (
+             <div className="text-center text-xs text-slate-600 px-4">
+                <button onClick={() => navigate('/login')} className="hover:text-knix-red">Admin Login</button>
+             </div>
+           )}
         </div>
       </aside>
 
-      {/* Mobile Header & Main Content */}
+      {/* Main Content */}
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
-        {/* Header */}
         <header className="h-16 bg-knix-bg border-b border-slate-800 flex items-center justify-between px-6">
           <div className="flex items-center">
             <button 
@@ -159,8 +131,8 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole }) => {
             >
               <Menu size={20} />
             </button>
-            <h1 className="text-lg font-semibold text-white capitalize">
-              {location.pathname.replace('/', '').toUpperCase() || 'DASHBOARD'}
+            <h1 className="text-lg font-semibold text-white capitalize font-rajdhani">
+              {location.pathname === '/' ? 'WELCOME' : location.pathname.replace('/', '').toUpperCase()}
             </h1>
           </div>
 
@@ -173,17 +145,9 @@ export const Layout: React.FC<LayoutProps> = ({ children, userRole }) => {
                 className="bg-transparent border-none focus:outline-none text-sm text-white w-48"
               />
             </div>
-            <button className="relative p-2 text-slate-400 hover:text-white">
-              <Bell size={20} />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-knix-red rounded-full"></span>
-            </button>
-            <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center border border-slate-600">
-               <User size={16} className="text-slate-300"/>
-            </div>
           </div>
         </header>
 
-        {/* Scrollable Content */}
         <main className="flex-1 overflow-y-auto p-6 scroll-smooth">
           {children}
         </main>

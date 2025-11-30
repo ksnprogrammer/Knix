@@ -1,215 +1,127 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../services/db';
-import { Course, Subject } from '../types';
-import { Plus, Upload, Book, Video, Save, X, Trash } from 'lucide-react';
+import { BlogPost, Subject } from '../types';
+import { Plus, Save, Trash, FileText, Image as ImageIcon } from 'lucide-react';
 
 export const CreatorDashboard: React.FC = () => {
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [isAddingCourse, setIsAddingCourse] = useState(false);
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [isCreating, setIsCreating] = useState(false);
   
-  // New Course Form State
-  const [newCourse, setNewCourse] = useState<Partial<Course>>({
+  const [newPost, setNewPost] = useState<Partial<BlogPost>>({
     title: '',
+    content: '',
     subject: 'Biology',
-    description: '',
-    duration: '',
-    instructor: 'Creator',
-    thumbnail: 'https://picsum.photos/400/225'
+    author: 'K.Sithara',
+    date: new Date().toISOString().split('T')[0]
   });
 
-  // Resource Upload State
-  const [uploadCategory, setUploadCategory] = useState<Subject>('Biology');
-  const [resourceTitle, setResourceTitle] = useState('');
-  const [resourceType, setResourceType] = useState<'pdf'|'image'>('pdf');
-
   useEffect(() => {
-    setCourses(db.getCourses());
+    setPosts(db.getPosts());
   }, []);
 
-  const handleAddCourse = () => {
-    if (!newCourse.title || !newCourse.description) return;
+  const handlePublish = () => {
+    if (!newPost.title || !newPost.content) return;
     
-    const course: Course = {
+    const post: BlogPost = {
       id: Date.now().toString(),
-      title: newCourse.title!,
-      subject: newCourse.subject as Subject,
-      description: newCourse.description!,
-      duration: newCourse.duration || '4 Weeks',
-      instructor: newCourse.instructor!,
-      progress: 0,
-      thumbnail: newCourse.thumbnail!,
-      syllabusUrl: '#'
+      title: newPost.title!,
+      content: newPost.content!,
+      subject: newPost.subject as Subject,
+      author: newPost.author!,
+      date: newPost.date!,
+      likes: 0,
+      imageUrl: newPost.imageUrl
     };
 
-    db.addCourse(course);
-    setCourses(db.getCourses());
-    setIsAddingCourse(false);
-    setNewCourse({ ...newCourse, title: '', description: '' });
+    db.addPost(post);
+    setPosts(db.getPosts());
+    setIsCreating(false);
+    setNewPost({ ...newPost, title: '', content: '' });
   };
 
-  const handleDeleteCourse = (id: string) => {
-    if (confirm("Delete this course?")) {
-      db.deleteCourse(id);
-      setCourses(db.getCourses());
-    }
-  };
-
-  const handleUploadResource = () => {
-    if(!resourceTitle) return;
-    
-    db.addResource(uploadCategory, {
-      id: Date.now().toString(),
-      title: resourceTitle,
-      type: resourceType,
-      size: '1.2 MB', // Mock size
-      downloads: 0
-    });
-    
-    alert(`Uploaded "${resourceTitle}" to ${uploadCategory} Database`);
-    setResourceTitle('');
+  const handleDelete = (id: string) => {
+     if(window.confirm('Delete this post?')) {
+        db.deletePost(id);
+        setPosts(db.getPosts());
+     }
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 max-w-5xl mx-auto">
       <div className="flex justify-between items-end border-b border-slate-800 pb-4">
          <div>
-            <h2 className="text-3xl font-bold text-white mb-2">Content Creator Studio</h2>
-            <p className="text-slate-400">Manage your courses, lessons, and learning resources.</p>
+            <h2 className="text-3xl font-bold text-white mb-2 font-rajdhani">Admin Studio</h2>
+            <p className="text-slate-400">Manage Study Feed & Resources.</p>
          </div>
+         <button 
+           onClick={() => setIsCreating(true)}
+           className="bg-knix-red hover:bg-knix-redHover text-white px-6 py-2 rounded-lg font-bold flex items-center gap-2"
+         >
+           <Plus size={20} /> New Spark Post
+         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        {/* Left Column: Course Management */}
-        <div className="lg:col-span-2 space-y-6">
-          <div className="flex justify-between items-center">
-            <h3 className="text-xl font-bold text-white">Your Courses</h3>
-            <button 
-              onClick={() => setIsAddingCourse(true)}
-              className="bg-knix-red hover:bg-knix-redHover text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2"
-            >
-              <Plus size={16} /> New Course
-            </button>
-          </div>
-
-          {isAddingCourse && (
-            <div className="bg-knix-card p-6 rounded-xl border border-slate-700 animate-in fade-in slide-in-from-top-4">
-               <h4 className="font-bold text-white mb-4">Create New Course</h4>
-               <div className="grid grid-cols-2 gap-4 mb-4">
-                  <input 
-                    className="bg-slate-900 border border-slate-700 p-2 rounded text-white" 
-                    placeholder="Course Title"
-                    value={newCourse.title}
-                    onChange={e => setNewCourse({...newCourse, title: e.target.value})}
-                  />
-                  <select 
+      {isCreating && (
+        <div className="bg-knix-card p-6 rounded-xl border border-slate-700 animate-in fade-in slide-in-from-top-4">
+           <h4 className="font-bold text-white mb-4">Create New Content</h4>
+           <div className="space-y-4">
+              <input 
+                 className="w-full bg-slate-900 border border-slate-700 p-3 rounded text-white text-lg font-bold" 
+                 placeholder="Post Title (Sinhala/English)"
+                 value={newPost.title}
+                 onChange={e => setNewPost({...newPost, title: e.target.value})}
+              />
+              <div className="flex gap-4">
+                 <select 
                     className="bg-slate-900 border border-slate-700 p-2 rounded text-white"
-                    value={newCourse.subject}
-                    onChange={e => setNewCourse({...newCourse, subject: e.target.value as Subject})}
-                  >
+                    value={newPost.subject}
+                    onChange={e => setNewPost({...newPost, subject: e.target.value as Subject})}
+                 >
                     <option value="Biology">Biology</option>
                     <option value="Physics">Physics</option>
                     <option value="Chemistry">Chemistry</option>
-                    <option value="Combined Maths">Combined Maths</option>
-                    <option value="ICT">ICT</option>
-                  </select>
-               </div>
-               <textarea 
-                  className="w-full bg-slate-900 border border-slate-700 p-2 rounded text-white mb-4 h-24"
-                  placeholder="Course Description"
-                  value={newCourse.description}
-                  onChange={e => setNewCourse({...newCourse, description: e.target.value})}
-               />
-               <div className="flex justify-end gap-2">
-                  <button onClick={() => setIsAddingCourse(false)} className="px-4 py-2 text-slate-400 hover:text-white">Cancel</button>
-                  <button onClick={handleAddCourse} className="px-4 py-2 bg-knix-red text-white rounded hover:bg-knix-redHover flex items-center gap-2">
-                     <Save size={16} /> Save Course
-                  </button>
-               </div>
-            </div>
-          )}
-
-          <div className="grid gap-4">
-            {courses.map(course => (
-              <div key={course.id} className="bg-knix-card p-4 rounded-xl border border-slate-800 flex justify-between items-center group">
-                 <div className="flex items-center gap-4">
-                    <img src={course.thumbnail} className="w-16 h-16 object-cover rounded-lg bg-slate-800" />
-                    <div>
-                       <h4 className="font-bold text-white">{course.title}</h4>
-                       <p className="text-xs text-slate-500">{course.subject} • {course.duration}</p>
-                    </div>
-                 </div>
-                 <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button className="p-2 bg-slate-800 rounded hover:text-blue-400"><Book size={16} /></button>
-                    <button onClick={() => handleDeleteCourse(course.id)} className="p-2 bg-slate-800 rounded hover:text-red-500"><Trash size={16} /></button>
-                 </div>
+                 </select>
+                 <input 
+                    className="bg-slate-900 border border-slate-700 p-2 rounded text-white flex-1"
+                    placeholder="Image URL (Optional)"
+                    value={newPost.imageUrl || ''}
+                    onChange={e => setNewPost({...newPost, imageUrl: e.target.value})}
+                 />
               </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Right Column: Resource Upload */}
-        <div className="space-y-6">
-           <div className="bg-knix-card p-6 rounded-xl border border-slate-800 sticky top-6">
-              <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2"><Upload size={20} /> Upload Resource</h3>
-              
-              <div className="space-y-4">
-                 <div>
-                    <label className="text-xs text-slate-500 block mb-1">Subject</label>
-                    <select 
-                      className="w-full bg-slate-900 border border-slate-700 p-2 rounded text-white text-sm"
-                      value={uploadCategory}
-                      onChange={e => setUploadCategory(e.target.value as Subject)}
-                    >
-                      <option value="Biology">Biology</option>
-                      <option value="Physics">Physics</option>
-                      <option value="Chemistry">Chemistry</option>
-                      <option value="Combined Maths">Combined Maths</option>
-                      <option value="ICT">ICT</option>
-                    </select>
-                 </div>
-                 
-                 <div>
-                    <label className="text-xs text-slate-500 block mb-1">Resource Title</label>
-                    <input 
-                       className="w-full bg-slate-900 border border-slate-700 p-2 rounded text-white text-sm"
-                       placeholder="e.g. 2024 Model Paper"
-                       value={resourceTitle}
-                       onChange={e => setResourceTitle(e.target.value)}
-                    />
-                 </div>
-
-                 <div>
-                    <label className="text-xs text-slate-500 block mb-1">File Type</label>
-                     <div className="flex gap-2">
-                        <button 
-                           onClick={() => setResourceType('pdf')}
-                           className={`flex-1 py-2 text-xs rounded border ${resourceType === 'pdf' ? 'bg-knix-red border-knix-red text-white' : 'border-slate-700 text-slate-400'}`}
-                        >
-                           PDF Document
-                        </button>
-                        <button 
-                           onClick={() => setResourceType('image')}
-                           className={`flex-1 py-2 text-xs rounded border ${resourceType === 'image' ? 'bg-knix-red border-knix-red text-white' : 'border-slate-700 text-slate-400'}`}
-                        >
-                           Image / Diagram
-                        </button>
-                     </div>
-                 </div>
-
-                 <div className="border-2 border-dashed border-slate-700 rounded-lg p-6 text-center text-slate-500 text-xs hover:bg-slate-800/50 cursor-pointer transition-colors">
-                    Click to browse files (Demo)
-                 </div>
-
-                 <button 
-                    onClick={handleUploadResource}
-                    className="w-full bg-white text-black font-bold py-2 rounded hover:bg-slate-200 transition-colors"
-                 >
-                    Publish to Database
+              <textarea 
+                 className="w-full bg-slate-900 border border-slate-700 p-3 rounded text-white h-48 font-mono text-sm"
+                 placeholder="Content (Supports markdown)..."
+                 value={newPost.content}
+                 onChange={e => setNewPost({...newPost, content: e.target.value})}
+              />
+              <div className="flex justify-end gap-2">
+                 <button onClick={() => setIsCreating(false)} className="px-4 py-2 text-slate-400 hover:text-white">Cancel</button>
+                 <button onClick={handlePublish} className="px-6 py-2 bg-knix-red text-white rounded font-bold hover:bg-knix-redHover flex items-center gap-2">
+                    <Save size={16} /> Publish to Feed
                  </button>
               </div>
            </div>
         </div>
+      )}
+
+      <div className="space-y-4">
+         <h3 className="text-xl font-bold text-white">Published Posts</h3>
+         {posts.map(post => (
+            <div key={post.id} className="bg-knix-card p-4 rounded-xl border border-slate-800 flex justify-between items-center group">
+               <div className="flex items-center gap-4">
+                  <div className="p-3 bg-slate-900 rounded-lg text-slate-400">
+                     <FileText size={24} />
+                  </div>
+                  <div>
+                     <h4 className="font-bold text-white">{post.title}</h4>
+                     <p className="text-xs text-slate-500">{post.subject} • {post.date} • {post.likes} Likes</p>
+                  </div>
+               </div>
+               <button onClick={() => handleDelete(post.id)} className="p-2 text-slate-500 hover:text-red-500 transition-colors">
+                  <Trash size={18} />
+               </button>
+            </div>
+         ))}
       </div>
     </div>
   );

@@ -1,39 +1,37 @@
-import { User, Course, ResourceCategory, ResourceItem } from '../types';
-import { INITIAL_USERS, INITIAL_COURSES, INITIAL_RESOURCES } from '../constants';
+import { User, BlogPost, ResourceCategory, ResourceItem, Subject } from '../types';
+import { INITIAL_USERS, INITIAL_POSTS, INITIAL_RESOURCES } from '../constants';
 
-// Keys for LocalStorage
 const KEYS = {
   USERS: 'knix_users_db',
-  COURSES: 'knix_courses_db',
+  POSTS: 'knix_posts_db',
   RESOURCES: 'knix_resources_db'
 };
 
-// Helper to initialize DB if empty
 const initDB = () => {
   if (!localStorage.getItem(KEYS.USERS)) {
     localStorage.setItem(KEYS.USERS, JSON.stringify(INITIAL_USERS));
   }
-  if (!localStorage.getItem(KEYS.COURSES)) {
-    localStorage.setItem(KEYS.COURSES, JSON.stringify(INITIAL_COURSES));
+  if (!localStorage.getItem(KEYS.POSTS)) {
+    localStorage.setItem(KEYS.POSTS, JSON.stringify(INITIAL_POSTS));
   }
   if (!localStorage.getItem(KEYS.RESOURCES)) {
     localStorage.setItem(KEYS.RESOURCES, JSON.stringify(INITIAL_RESOURCES));
   }
 };
 
-// Initialize immediately
 initDB();
 
 export const db = {
-  // --- USER OPERATIONS ---
-  getUsers: (): User[] => {
-    return JSON.parse(localStorage.getItem(KEYS.USERS) || '[]');
-  },
+  // --- USER ---
+  getUsers: (): User[] => JSON.parse(localStorage.getItem(KEYS.USERS) || '[]'),
   
-  updateUserRole: (userId: string, newRole: 'student' | 'admin' | 'content_creator') => {
+  updateUserRole: (userId: string, newRole: User['role']) => {
     const users = db.getUsers();
-    const updated = users.map(u => u.id === userId ? { ...u, role: newRole } : u);
-    localStorage.setItem(KEYS.USERS, JSON.stringify(updated));
+    const index = users.findIndex(u => u.id === userId);
+    if (index > -1) {
+      users[index].role = newRole;
+      localStorage.setItem(KEYS.USERS, JSON.stringify(users));
+    }
   },
 
   deleteUser: (userId: string) => {
@@ -41,41 +39,33 @@ export const db = {
     const updated = users.filter(u => u.id !== userId);
     localStorage.setItem(KEYS.USERS, JSON.stringify(updated));
   },
-
-  // --- COURSE OPERATIONS ---
-  getCourses: (): Course[] => {
-    return JSON.parse(localStorage.getItem(KEYS.COURSES) || '[]');
+  
+  // --- POSTS (BLOG) ---
+  getPosts: (): BlogPost[] => JSON.parse(localStorage.getItem(KEYS.POSTS) || '[]'),
+  
+  addPost: (post: BlogPost) => {
+    const posts = db.getPosts();
+    posts.unshift(post); // Add to top
+    localStorage.setItem(KEYS.POSTS, JSON.stringify(posts));
   },
 
-  addCourse: (course: Course) => {
-    const courses = db.getCourses();
-    courses.push(course);
-    localStorage.setItem(KEYS.COURSES, JSON.stringify(courses));
+  deletePost: (id: string) => {
+    const posts = db.getPosts();
+    const updated = posts.filter(p => p.id !== id);
+    localStorage.setItem(KEYS.POSTS, JSON.stringify(updated));
   },
 
-  deleteCourse: (courseId: string) => {
-    const courses = db.getCourses();
-    const updated = courses.filter(c => c.id !== courseId);
-    localStorage.setItem(KEYS.COURSES, JSON.stringify(updated));
-  },
+  // --- RESOURCES ---
+  getResources: (): ResourceCategory[] => JSON.parse(localStorage.getItem(KEYS.RESOURCES) || '[]'),
 
-  // --- RESOURCE OPERATIONS ---
-  getResources: (): ResourceCategory[] => {
-    return JSON.parse(localStorage.getItem(KEYS.RESOURCES) || '[]');
-  },
-
-  addResource: (category: string, item: ResourceItem) => {
+  addResource: (category: Subject, item: ResourceItem) => {
     const resources = db.getResources();
     const catIndex = resources.findIndex(r => r.category === category);
     
     if (catIndex > -1) {
       resources[catIndex].items.push(item);
     } else {
-      // Create new category if not exists (though type safety limits this in UI)
-      resources.push({
-        category: category as any,
-        items: [item]
-      });
+      resources.push({ category, items: [item] });
     }
     localStorage.setItem(KEYS.RESOURCES, JSON.stringify(resources));
   }
