@@ -6,7 +6,7 @@ Knix is an open-source, advanced learning platform for A/L Biology, Physics, and
 
 Click the button below to deploy this project to Netlify for free. This will set up the build process and hosting automatically.
 
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/your-username/knix-platform)
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/ksnprogrammer/kniz.git)
 
 ## 🛠 Features
 
