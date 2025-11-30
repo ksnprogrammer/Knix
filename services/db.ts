@@ -56,6 +56,15 @@ export const db = {
     localStorage.setItem(KEYS.POSTS, JSON.stringify(updated));
   },
 
+  updatePost: (updatedPost: BlogPost) => {
+    const posts = db.getPosts();
+    const index = posts.findIndex(p => p.id === updatedPost.id);
+    if (index > -1) {
+      posts[index] = updatedPost;
+      localStorage.setItem(KEYS.POSTS, JSON.stringify(posts));
+    }
+  },
+
   // --- RESOURCES ---
   getResources: (): ResourceCategory[] => JSON.parse(localStorage.getItem(KEYS.RESOURCES) || '[]'),
 
@@ -78,5 +87,40 @@ export const db = {
         items: cat.items.filter(item => item.id !== resourceId)
     }));
     localStorage.setItem(KEYS.RESOURCES, JSON.stringify(updated));
+  },
+
+  updateResource: (updatedResource: ResourceItem, originalCategory: Subject) => {
+    const resources = db.getResources();
+    const newCategory = (updatedResource as any).category as Subject;
+
+    // If category hasn't changed, update in place
+    if (newCategory === originalCategory) {
+      const updated = resources.map(cat => ({
+        ...cat,
+        items: cat.items.map(item => item.id === updatedResource.id ? updatedResource : item)
+      }));
+      localStorage.setItem(KEYS.RESOURCES, JSON.stringify(updated));
+      return;
+    }
+
+    // If category has changed, move the resource
+    // 1. Remove from old category
+    const resourcesWithoutOld = resources.map(cat => {
+      if (cat.category === originalCategory) {
+        return { ...cat, items: cat.items.filter(item => item.id !== updatedResource.id) };
+      }
+      return cat;
+    });
+
+    // 2. Add to new category
+    const newCategoryIndex = resourcesWithoutOld.findIndex(cat => cat.category === newCategory);
+    if (newCategoryIndex > -1) {
+      resourcesWithoutOld[newCategoryIndex].items.push(updatedResource);
+    } else {
+      // If the new category doesn't exist, create it
+      resourcesWithoutOld.push({ category: newCategory, items: [updatedResource] });
+    }
+
+    localStorage.setItem(KEYS.RESOURCES, JSON.stringify(resourcesWithoutOld));
   }
 };

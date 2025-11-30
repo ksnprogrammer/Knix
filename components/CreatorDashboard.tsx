@@ -9,7 +9,8 @@ export const CreatorDashboard: React.FC = () => {
   
   // --- POSTS STATE ---
   const [posts, setPosts] = useState<BlogPost[]>([]);
-  const [isCreatingPost, setIsCreatingPost] = useState(false);
+  const [isPostFormOpen, setIsPostFormOpen] = useState(false);
+  const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
   const [postViewMode, setPostViewMode] = useState<'write' | 'preview'>('write');
   
   const [newPost, setNewPost] = useState<Partial<BlogPost>>({
@@ -22,7 +23,9 @@ export const CreatorDashboard: React.FC = () => {
 
   // --- RESOURCES STATE ---
   const [resources, setResources] = useState<ResourceCategory[]>([]);
-  const [isAddingResource, setIsAddingResource] = useState(false);
+  const [isResourceFormOpen, setIsResourceFormOpen] = useState(false);
+  const [editingResource, setEditingResource] = useState<ResourceItem | null>(null);
+  const [originalResourceCategory, setOriginalResourceCategory] = useState<Subject | null>(null);
   
   const [newResource, setNewResource] = useState<{
       title: string;
@@ -52,22 +55,34 @@ export const CreatorDashboard: React.FC = () => {
   // --- POST HANDLERS ---
   const handlePublishPost = () => {
     if (!newPost.title || !newPost.content) return;
-    
-    const post: BlogPost = {
-      id: Date.now().toString(),
-      title: newPost.title!,
-      content: newPost.content!,
-      subject: newPost.subject as Subject,
-      author: newPost.author!,
-      date: newPost.date!,
-      likes: 0,
-      imageUrl: newPost.imageUrl
-    };
 
-    db.addPost(post);
+    if (editingPost) {
+      const updatedPost = { ...editingPost, ...newPost };
+      db.updatePost(updatedPost);
+    } else {
+      const post: BlogPost = {
+        id: Date.now().toString(),
+        title: newPost.title!,
+        content: newPost.content!,
+        subject: newPost.subject as Subject,
+        author: newPost.author!,
+        date: newPost.date!,
+        likes: 0,
+        imageUrl: newPost.imageUrl
+      };
+      db.addPost(post);
+    }
+
     refreshData();
-    setIsCreatingPost(false);
-    setNewPost({ ...newPost, title: '', content: '' });
+    setIsPostFormOpen(false);
+    setEditingPost(null);
+    setNewPost({ title: '', content: '', subject: 'Biology', author: 'K.Sithara', date: new Date().toISOString().split('T')[0] });
+  };
+
+  const handleEditPost = (post: BlogPost) => {
+    setEditingPost(post);
+    setNewPost(post);
+    setIsPostFormOpen(true);
   };
 
   const handleDeletePost = (id: string) => {
@@ -94,30 +109,37 @@ export const CreatorDashboard: React.FC = () => {
 
   // --- RESOURCE HANDLERS ---
   const handleAddResource = () => {
-      if(!newResource.title || !newResource.url) return;
+    if (!newResource.title || !newResource.url) return;
 
+    if (editingResource && originalResourceCategory) {
+      const updatedResource = { ...editingResource, ...newResource };
+      db.updateResource(updatedResource, originalResourceCategory);
+    } else {
       const item: ResourceItem = {
-          id: Date.now().toString(),
-          title: newResource.title,
-          type: newResource.type,
-          size: newResource.size || '0 MB',
-          downloads: 0,
-          url: newResource.url,
-          description: newResource.description,
-          author: 'K.Sithara'
+        id: Date.now().toString(),
+        title: newResource.title,
+        type: newResource.type,
+        size: newResource.size || '0 MB',
+        downloads: 0,
+        url: newResource.url,
+        description: newResource.description,
+        author: 'K.Sithara'
       };
-
       db.addResource(newResource.category, item);
-      refreshData();
-      setIsAddingResource(false);
-      setNewResource({
-          title: '',
-          category: 'Biology',
-          type: 'pdf',
-          size: '',
-          url: '',
-          description: ''
-      });
+    }
+
+    refreshData();
+    setIsResourceFormOpen(false);
+    setEditingResource(null);
+    setOriginalResourceCategory(null);
+    setNewResource({ title: '', category: 'Biology', type: 'pdf', size: '', url: '', description: '' });
+  };
+
+  const handleEditResource = (resource: ResourceItem, category: Subject) => {
+    setEditingResource(resource);
+    setOriginalResourceCategory(category);
+    setNewResource({ ...resource, category });
+    setIsResourceFormOpen(true);
   };
 
   const handleDeleteResource = (id: string) => {
@@ -158,17 +180,17 @@ export const CreatorDashboard: React.FC = () => {
                     <FileText className="text-knix-red" /> Published Posts ({posts.length})
                 </h3>
                 <button 
-                    onClick={() => setIsCreatingPost(true)}
+                    onClick={() => { setEditingPost(null); setNewPost({ title: '', content: '', subject: 'Biology', author: 'K.Sithara', date: new Date().toISOString().split('T')[0] }); setIsPostFormOpen(true); }}
                     className="bg-knix-card border border-knix-red text-knix-red hover:bg-knix-red hover:text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 transition-colors"
                 >
                     <Plus size={18} /> Create New
                 </button>
             </div>
 
-            {isCreatingPost && (
+            {isPostFormOpen && (
                 <div className="bg-knix-card p-6 rounded-xl border border-knix-border animate-in fade-in slide-in-from-top-4 shadow-sm">
                 <div className="flex justify-between items-center mb-6">
-                    <h4 className="font-bold text-knix-text text-lg">Create New Spark Post</h4>
+                    <h4 className="font-bold text-knix-text text-lg">{editingPost ? 'Edit Spark Post' : 'Create New Spark Post'}</h4>
                     <div className="flex bg-knix-bg rounded-lg border border-knix-border p-1">
                         <button 
                             onClick={() => setPostViewMode('write')}
@@ -241,11 +263,11 @@ export const CreatorDashboard: React.FC = () => {
                     )}
 
                     <div className="flex justify-end gap-3 pt-2">
-                        <button onClick={() => setIsCreatingPost(false)} className="px-6 py-2.5 rounded-lg border border-knix-border text-knix-muted hover:text-knix-text hover:bg-knix-card font-medium transition-colors">
+                        <button onClick={() => { setIsPostFormOpen(false); setEditingPost(null); }} className="px-6 py-2.5 rounded-lg border border-knix-border text-knix-muted hover:text-knix-text hover:bg-knix-card font-medium transition-colors">
                             Cancel
                         </button>
                         <button onClick={handlePublishPost} className="px-8 py-2.5 bg-knix-red text-white rounded-lg font-bold hover:bg-knix-redHover flex items-center gap-2 shadow-lg shadow-knix-red/20 transition-all hover:-translate-y-0.5">
-                            <Save size={18} /> Publish Spark
+                            <Save size={18} /> {editingPost ? 'Update Spark' : 'Publish Spark'}
                         </button>
                     </div>
                 </div>
@@ -277,6 +299,9 @@ export const CreatorDashboard: React.FC = () => {
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
+                        <button onClick={() => handleEditPost(post)} className="p-2 text-knix-muted hover:text-knix-red hover:bg-knix-red/10 rounded-lg transition-colors">
+                            <Edit3 size={18} />
+                        </button>
                         <button onClick={() => handleDeletePost(post.id)} className="p-2 text-knix-muted hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors">
                             <Trash size={18} />
                         </button>
@@ -295,16 +320,16 @@ export const CreatorDashboard: React.FC = () => {
                     <Download className="text-knix-red" /> Resource Library
                 </h3>
                 <button 
-                    onClick={() => setIsAddingResource(true)}
+                    onClick={() => { setEditingResource(null); setNewResource({ title: '', category: 'Biology', type: 'pdf', size: '', url: '', description: '' }); setIsResourceFormOpen(true); }}
                     className="bg-knix-card border border-knix-red text-knix-red hover:bg-knix-red hover:text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 transition-colors"
                 >
                     <Plus size={18} /> Upload Resource
                 </button>
             </div>
 
-            {isAddingResource && (
+            {isResourceFormOpen && (
                 <div className="bg-knix-card p-6 rounded-xl border border-knix-border animate-in fade-in slide-in-from-top-4 shadow-sm">
-                    <h4 className="font-bold text-knix-text text-lg mb-6">Upload New Resource</h4>
+                    <h4 className="font-bold text-knix-text text-lg mb-6">{editingResource ? 'Edit Resource' : 'Upload New Resource'}</h4>
                     <div className="grid md:grid-cols-2 gap-6">
                         <div className="space-y-4">
                             <div className="space-y-2">
@@ -376,11 +401,11 @@ export const CreatorDashboard: React.FC = () => {
                         </div>
                     </div>
                     <div className="flex justify-end gap-3 pt-6 border-t border-knix-border mt-4">
-                        <button onClick={() => setIsAddingResource(false)} className="px-6 py-2.5 rounded-lg border border-knix-border text-knix-muted hover:text-knix-text hover:bg-knix-card font-medium transition-colors">
+                        <button onClick={() => { setIsResourceFormOpen(false); setEditingResource(null); }} className="px-6 py-2.5 rounded-lg border border-knix-border text-knix-muted hover:text-knix-text hover:bg-knix-card font-medium transition-colors">
                             Cancel
                         </button>
                         <button onClick={handleAddResource} className="px-8 py-2.5 bg-knix-red text-white rounded-lg font-bold hover:bg-knix-redHover flex items-center gap-2 shadow-lg shadow-knix-red/20 transition-all hover:-translate-y-0.5">
-                            <Save size={18} /> Save Resource
+                            <Save size={18} /> {editingResource ? 'Update Resource' : 'Save Resource'}
                         </button>
                     </div>
                 </div>
@@ -406,13 +431,22 @@ export const CreatorDashboard: React.FC = () => {
                                                 <p className="text-xs text-knix-muted">{item.size} • {item.downloads} downloads</p>
                                             </div>
                                         </div>
-                                        <button 
-                                            onClick={() => handleDeleteResource(item.id)}
-                                            className="text-knix-muted hover:text-red-500 hover:bg-red-500/10 p-2 rounded transition-colors"
-                                            title="Delete Resource"
-                                        >
-                                            <Trash size={18} />
-                                        </button>
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                onClick={() => handleEditResource(item, category.category)}
+                                                className="text-knix-muted hover:text-knix-red hover:bg-knix-red/10 p-2 rounded transition-colors"
+                                                title="Edit Resource"
+                                            >
+                                                <Edit3 size={18} />
+                                            </button>
+                                            <button
+                                                onClick={() => handleDeleteResource(item.id)}
+                                                className="text-knix-muted hover:text-red-500 hover:bg-red-500/10 p-2 rounded transition-colors"
+                                                title="Delete Resource"
+                                            >
+                                                <Trash size={18} />
+                                            </button>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
